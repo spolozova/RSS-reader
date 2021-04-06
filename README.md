@@ -3,4 +3,4 @@
 [![Node CI](https://github.com/spolozova/frontend-project-lvl3/actions/workflows/node.js.yml/badge.svg)](https://github.com/spolozova/frontend-project-lvl3/actions/workflows/node.js.yml)
 
 
-[Web](https://frontend-project-lvl3-brown-two.vercel.app/)
+[Web-site](https://frontend-project-lvl3-brown-two.vercel.app/)
