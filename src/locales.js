@@ -1,16 +1,22 @@
 export default {
   ru: {
     translation: {
-      errorMessages: {
+      feedbackMessages: {
         validationErrors: {
           invalidUrl: 'Ссылка должна быть валидным URL',
           repeatedUrl: 'RSS уже существует',
         },
         parserError: 'Ресурс не содержит валидный RSS',
-        networkError: 'Проблемы с сетью',
+        networkError: 'Ошибка сети',
+        successFeedback: 'RSS успешно загружен',
       },
-      successFeedback: 'RSS успешно загружен',
-      modalButton: 'Просмотр',
+      buttons: {
+        postButton: 'Просмотр',
+        modalClose: 'Закрыть',
+        modalread: 'Читать полностью',
+      },
+      feeds: 'Фиды',
+      posts: 'Посты',
     },
   },
 };
