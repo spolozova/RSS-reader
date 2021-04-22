@@ -52,7 +52,8 @@ export default () => {
   i18nextInstance.init({
     lng: 'ru',
     resources,
-  });
+  })
+  .then(())
 
   const formState = {
     value: '',
@@ -117,6 +118,15 @@ export default () => {
         }
         watchedForm.processState = 'failed';
       });
+  });
+  const readButton = modal.querySelector('full-article');
+  const closeButton = modal.querySelector('.btn-secondary');
+  readButton.addEventListener('click', () => {
+    state.state = 'waiting';
+  });
+  closeButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    state.state = 'waiting';
   });
 
   setTimeout(function run() {

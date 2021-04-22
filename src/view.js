@@ -99,7 +99,6 @@ const readedPostsHandler = (values) => {
 const renderModalComponent = (state, value) => {
   const modal = document.querySelector('#modal');
   const readButton = modal.querySelector('full-article');
-  const closeButton = modal.querySelector('.btn-secondary');
   if (value === 'reading') {
     document.body.classList.add('modal-open');
     modal.classList.add('show');
@@ -112,7 +111,7 @@ const renderModalComponent = (state, value) => {
     modal.querySelector('.modal-title').textContent = post.title;
     modal.querySelector('.modal.body').textContent = post.discription;
     readButton.href = post.link;
-  } else if (value === 'waiting') {
+  } else {
     modal.classList.remove('show');
     modal.style.display = 'none';
     modal.removeAttribute('aria-modal');
@@ -120,13 +119,6 @@ const renderModalComponent = (state, value) => {
     modal.removeAttribute('padding-right');
     modal.setAttribute('aria-hidden', 'true');
   }
-  readButton.addEventListener('click', () => {
-    state.state = 'waiting';
-  });
-  closeButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    state.state = 'waiting';
-  });
 };
 
 const initFormView = (state) => onChange(state, (path, value) => {
