@@ -49,11 +49,6 @@ const schema = yup.string().url('invalidUrl');
 
 export default () => {
   const i18nextInstance = i18next.createInstance();
-  i18nextInstance.init({
-    lng: 'ru',
-    resources,
-  })
-  .then(())
 
   const formState = {
     value: '',
@@ -71,66 +66,72 @@ export default () => {
     readedPostsId: [],
   };
 
-  const watchedForm = initFormView(formState);
-  const watchedFeeds = initFeedsView(feedsState);
+  i18nextInstance.init({
+    lng: 'ru',
+    resources,
+  })
+    .then((i18n) => {
+      const watchedForm = initFormView(i18n, formState);
+      const watchedFeeds = initFeedsView(feedsState);
+      const form = document.querySelector('form');
 
-  const form = document.querySelector('form');
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    watchedForm.processState = 'validation';
-    watchedForm.feedback = '';
-    watchedForm.value = document.querySelector('input').value;
-    schema
-      .validate(watchedForm.value)
-      .then(() => {
-        watchedForm.valid = true;
-        if (_.indexOf(watchedForm.rssUrls, watchedForm.value) !== -1) {
-          watchedFeeds.rssUrls.push(watchedForm.value);
-        } else {
-          throw new Error('repeatedUrl');
-        }
-      })
-      .then(() => (axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(watchedForm.value)}`)))
-      .then((response) => parseRss(response.data))
-      .then(({ title, description, posts }) => {
-        watchedFeeds.feedsCounter += 1;
-        watchedFeeds.feeds.push({ id: watchedFeeds.feedsCounter, title, description });
-        posts.forEach((post) => {
-          watchedFeeds.postsCounter += 1;
-          watchedFeeds.posts.push({
-            id: watchedFeeds.postsCounter,
-            status: 'unreaded',
-            ...post,
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        watchedForm.processState = 'validation';
+        watchedForm.feedback = '';
+        watchedForm.value = document.querySelector('input').value;
+        schema
+          .validate(watchedForm.value)
+          .then(() => {
+            watchedForm.valid = true;
+            if (_.indexOf(watchedForm.rssUrls, watchedForm.value) !== -1) {
+              watchedFeeds.rssUrls.push(watchedForm.value);
+            } else {
+              throw new Error('repeatedUrl');
+            }
+          })
+          .then(() => (axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(watchedForm.value)}`)))
+          .then((response) => parseRss(response.data))
+          .then(({ title, description, posts }) => {
+            watchedFeeds.feedsCounter += 1;
+            watchedFeeds.feeds.push({ id: watchedFeeds.feedsCounter, title, description });
+            posts.forEach((post) => {
+              watchedFeeds.postsCounter += 1;
+              watchedFeeds.posts.push({
+                id: watchedFeeds.postsCounter,
+                status: 'unreaded',
+                ...post,
+              });
+            });
+            watchedForm.processState = 'succeeded';
+            watchedForm.feedback = 'successFeedback';
+          })
+          .catch((err) => {
+            if (err.message === 'invalidUrl' || err.message === 'repeatedUrl') {
+              watchedForm.valid = false;
+              watchedForm.feedback = e.message;
+            } else if (err.message === 'parserError') {
+              watchedForm.feedback = e.message;
+            } else {
+              watchedForm.feedback = 'networkError';
+            }
+            watchedForm.processState = 'failed';
           });
-        });
-        watchedForm.processState = 'succeeded';
-        watchedForm.feedback = 'successFeedback';
-      })
-      .catch((err) => {
-        if (err.message === 'invalidUrl' || err.message === 'repeatedUrl') {
-          watchedForm.valid = false;
-          watchedForm.feedback = e.message;
-        } else if (err.message === 'parserError') {
-          watchedForm.feedback = e.message;
-        } else {
-          watchedForm.feedback = 'networkError';
-        }
-        watchedForm.processState = 'failed';
       });
-  });
-  const readButton = modal.querySelector('full-article');
-  const closeButton = modal.querySelector('.btn-secondary');
-  readButton.addEventListener('click', () => {
-    state.state = 'waiting';
-  });
-  closeButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    state.state = 'waiting';
-  });
+      const modal = document.querySelector('#modal');
+      const readButton = modal.querySelector('full-article');
+      const closeButton = modal.querySelector('.btn-secondary');
+      readButton.addEventListener('click', () => {
+        watchedFeeds.state = 'waiting';
+      });
+      closeButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        watchedFeeds.state = 'waiting';
+      });
 
-  setTimeout(function run() {
-    takeNewPosts(watchedFeeds);
-    setTimeout(run, 5000);
-  }, 5000);
+      setTimeout(function run() {
+        takeNewPosts(watchedFeeds);
+        setTimeout(run, 5000);
+      }, 5000);
+    });
 };
