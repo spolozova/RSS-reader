@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import _ from 'lodash';
 import i18next from 'i18next';
+import 'bootstrap';
 
 import { initFormView, initFeedsView } from './view.js';
 import resources from './locales';
