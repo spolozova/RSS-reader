@@ -89,7 +89,9 @@ const renderPosts = (t, posts, state) => {
     ulElement.append(liEl);
   });
   postsContainer.append(hEl, ulElement);
-  readedPostsHandler(state.readedPostsId);
+  if (state.readedPostsId.length !== 0) {
+    readedPostsHandler(state.readedPostsId);
+  }
 };
 
 const modalComponentHandler = (state, value) => {

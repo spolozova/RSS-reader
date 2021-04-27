@@ -7,7 +7,7 @@ import 'bootstrap/js/dist/modal.js';
 import initView from './view.js';
 import resources from './locales';
 
-const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}`;
+const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 const POSTS_REQUEST_TIMER = 5000;
 
 const parseRss = (data) => {
@@ -33,9 +33,13 @@ const parseRss = (data) => {
 };
 
 const updatePosts = (state) => {
+  console.log(state.rssUrls);
   const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
   Promise.all(requests)
-    .then((responses) => responses.map((response) => parseRss(response.data)))
+    .then((responses) => {
+      console.log(responses);
+      return responses.map((response) => parseRss(response.data));
+    })
     .then((parsedData) => {
       parsedData.forEach(({ posts }) => posts.forEach((post) => {
         if (!_.find(state.posts, ['link', post.link])) {
@@ -92,16 +96,8 @@ export default () => {
               throw new Error('repeatedUrl');
             }
           })
-          .then(() => {
-            console.log(typeof watchedState.form.value);
-            const fullUrl = getFullUrl(watchedState.form.value);
-            console.log(fullUrl);
-            return axios.get(fullUrl);
-          })
-          .then((response) => {
-            console.log(response.data);
-            return parseRss(response.data);
-          })
+          .then(() => axios.get(getFullUrl(watchedState.form.value)))
+          .then((response) => parseRss(response.data))
           .then(({ title, description, posts }) => {
             watchedState.feedsCounter += 1;
             watchedState.feeds = [{
