@@ -36,8 +36,8 @@ const processStateHandler = (t, state, value) => {
 const readedPostsHandler = (values) => {
   values.forEach((value) => {
     const post = document.querySelector(`[data-id="${value}"]`);
-    post.classList.remove('fw-bold');
-    post.classList.add('fw-normal');
+    post.classList.remove('fw-bold', 'font-weight-bold');
+    post.classList.add('fw-normal', 'font-weight-normal');
   });
 };
 
@@ -83,7 +83,7 @@ const renderPosts = (t, posts, state) => {
     const aEl = document.createElement('a');
     aEl.href = post.link;
     aEl.textContent = post.title;
-    aEl.classList.add('fw-bold', 'text-decoration-none');
+    aEl.classList.add('fw-bold', 'text-decoration-none', 'font-weight-bold');
     aEl.setAttribute('data-id', post.id);
     aEl.setAttribute('target', '_blank');
     aEl.setAttribute('rel', 'noopener noreferrer');
