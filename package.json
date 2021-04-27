@@ -5,12 +5,13 @@
   "main": "src/init.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "start": "webpack serve"
   },
-"script": {
-  "build": "webpack --watch"
-},
- "repository": {
+  "script": {
+    "build": "webpack --watch"
+  },
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/spolozova/frontend-project-lvl3.git"
   },
@@ -22,29 +23,31 @@
   },
   "homepage": "https://github.com/spolozova/frontend-project-lvl3#readme",
   "devDependencies": {
-    "@babel/core": "^7.13.14",
-    "@babel/preset-env": "^7.13.12",
-    "@webpack-cli/generators": "^2.0.0",
-    "babel-loader": "^8.2.2",
-    "css-loader": "^5.2.0",
-    "eslint": "^7.23.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-loader": "^4.0.2",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-webpack-plugin": "^2.5.3",
-    "html-webpack-plugin": "^5.3.1",
-    "style-loader": "^2.0.0",
-    "webpack": "^5.30.0",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2"
+    "@babel/core": "7.13.14",
+    "@babel/preset-env": "7.13.12",
+    "@webpack-cli/generators": "2.0.0",
+    "babel-loader": "8.2.2",
+    "css-loader": "5.2.0",
+    "eslint": "7.23.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-loader": "4.0.2",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-webpack-plugin": "2.5.3",
+    "html-webpack-plugin": "5.3.1",
+    "source-map-loader": "2.0.1",
+    "style-loader": "2.0.0",
+    "webpack": "5.30.0",
+    "webpack-cli": "4.6.0",
+    "webpack-dev-server": "3.11.2"
   },
   "dependencies": {
-    "@popperjs/core": "^2.9.2",
-    "axios": "^0.21.1",
-    "bootstrap": "^5.0.0-beta3",
-    "i18next": "^20.2.1",
-    "lodash": "^4.17.21",
-    "on-change": "^2.2.3",
-    "yup": "^0.32.9"
+    "@popperjs/core": "2.9.2",
+    "axios": "0.21.1",
+    "bootstrap": "5.0.0-beta3",
+    "i18next": "20.2.1",
+    "jquery": "3.6.0",
+    "lodash": "4.17.21",
+    "on-change": "2.2.3",
+    "yup": "0.32.9"
   }
 }

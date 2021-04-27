@@ -1,15 +1,12 @@
 export default {
   ru: {
     translation: {
-      feedbackMessages: {
-        validationErrors: {
-          invalidUrl: 'Ссылка должна быть валидным URL',
-          repeatedUrl: 'RSS уже существует',
-        },
-        parserError: 'Ресурс не содержит валидный RSS',
-        networkError: 'Ошибка сети',
-        successFeedback: 'RSS успешно загружен',
-      },
+      invalidUrl: 'Ссылка должна быть валидным URL',
+      repeatedUrl: 'RSS уже существует',
+      parserError: 'Ресурс не содержит валидный RSS',
+      networkError: 'Ошибка сети',
+      success: 'RSS успешно загружен',
+      empty: 'Не должно быть пустым',
       buttons: {
         postButton: 'Просмотр',
         modalClose: 'Закрыть',
