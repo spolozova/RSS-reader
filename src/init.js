@@ -9,7 +9,6 @@ import resources from './locales';
 
 const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 const POSTS_REQUEST_TIMER = 5000;
-
 const parseRss = (data) => {
   const parser = new DOMParser();
   try {
@@ -33,13 +32,9 @@ const parseRss = (data) => {
 };
 
 const updatePosts = (state) => {
-  console.log(state.rssUrls);
   const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
   Promise.all(requests)
-    .then((responses) => {
-      console.log(responses);
-      return responses.map((response) => parseRss(response.data));
-    })
+    .then((responses) => responses.map((response) => parseRss(response.data)))
     .then((parsedData) => {
       parsedData.forEach(({ posts }) => posts.forEach((post) => {
         if (!_.find(state.posts, ['link', post.link])) {

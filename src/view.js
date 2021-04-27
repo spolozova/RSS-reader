@@ -19,12 +19,15 @@ const processStateHandler = (t, state, value) => {
   const input = document.querySelector('input');
   if (value === 'validation') {
     submitButton.setAttribute('disabled', '');
+    input.setAttribute('readonly', '');
   } else if (value === 'failed') {
     feedback.classList.remove('text-success');
     feedback.classList.add('text-danger');
+    input.removeAttribute('readonly', '');
   } else if (value === 'succeeded') {
     feedback.classList.remove('text-danger');
     feedback.classList.add('text-success');
+    input.removeAttribute('readonly', '');
     input.value = '';
   }
   feedback.textContent = t(state.form.feedback);
