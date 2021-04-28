@@ -65,6 +65,8 @@ const renderModalButton = (t, id) => {
   modalButton.dataset.id = id;
   modalButton.dataset.bsToggle = 'modal';
   modalButton.dataset.bsTarget = '#modal';
+  modalButton.dataset.toggle = 'modal';
+  modalButton.dataset.target = '#modal';
   modalButton.setAttribute('type', 'button');
   modalButton.textContent = t('buttons.postButton');
   return modalButton;
