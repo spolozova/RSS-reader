@@ -118,11 +118,17 @@ export default () => {
             watchedState.rssUrls.push(watchedState.form.value);
           })
           .then(() => {
-            // const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+            const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
             const aEl = document.querySelectorAll('a');
             aEl.forEach((el) => el.addEventListener('click', (ev) => {
               watchedState.readedPostsId.push(ev.target.dataset.id);
             }));
+            modalButtons.forEach((button) => {
+              button.addEventListener('click', (event) => {
+                state.readedPostsId.push(event.target.dataset.id);
+                state.processState = 'reading';
+              });
+            });
             const modal = document.querySelector('.modal');
             modal.addEventListener('hide.bs.modal', () => {
               watchedState.processState = 'waiting';
