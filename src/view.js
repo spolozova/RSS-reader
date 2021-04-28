@@ -104,9 +104,8 @@ const modalComponentHandler = (state, value) => {
   if (value === 'reading') {
     const { length } = state.readedPostsId;
     const post = _.find(state.posts, { id: Number(state.readedPostsId[length - 1]) });
-    console.log(post);
     document.querySelector('.modal-title').textContent = post.title;
-    document.querySelector('.modal-body').textContent = `${post.description}`;
+    document.querySelector('.modal-body').textContent = post.description;
     readButton.href = post.link;
   }
 };
