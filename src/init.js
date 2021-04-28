@@ -3,6 +3,7 @@ import _ from 'lodash';
 import i18next from 'i18next';
 import axios from 'axios';
 import 'bootstrap/js/dist/modal.js';
+import 'bootstrap';
 
 import initView from './view.js';
 import resources from './locales';
