@@ -63,8 +63,8 @@ const renderModalButton = (t, id) => {
   const modalButton = document.createElement('button');
   modalButton.classList.add('btn', 'btn-primary', 'btn-sm');
   modalButton.dataset.id = id;
-  // modalButton.dataset.bsToggle = 'modal';
-  // modalButton.dataset.bsTarget = '#modal';
+  modalButton.dataset.bsToggle = 'modal';
+  modalButton.dataset.bsTarget = '#modal';
   modalButton.dataset.toggle = 'modal';
   modalButton.dataset.target = '#modal';
   modalButton.setAttribute('type', 'button');
