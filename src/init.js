@@ -125,8 +125,8 @@ export default () => {
             }));
             modalButtons.forEach((button) => {
               button.addEventListener('click', (event) => {
-                state.readedPostsId.push(event.target.dataset.id);
-                state.processState = 'reading';
+                watchedState.readedPostsId.push(event.target.dataset.id);
+                watchedState.processState = 'reading';
               });
             });
             const modal = document.querySelector('.modal');
