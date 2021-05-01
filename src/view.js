@@ -24,13 +24,14 @@ const processStateHandler = (t, state, value) => {
     feedback.classList.remove('text-success');
     feedback.classList.add('text-danger');
     input.removeAttribute('readonly', '');
+    feedback.textContent = t(state.form.feedback);
   } else if (value === 'succeeded') {
     feedback.classList.remove('text-danger');
     feedback.classList.add('text-success');
     input.removeAttribute('readonly', '');
     input.value = '';
+    feedback.textContent = t(state.form.feedback);
   }
-  feedback.textContent = t(state.form.feedback);
 };
 
 const readedPostsHandler = (values) => {
@@ -59,7 +60,7 @@ const renderFeeds = (t, feeds) => {
   feedContainer.append(ulElement);
 };
 
-const renderModalButton = (t, id) => {
+const renderModalButton = (t, id, state) => {
   const modalButton = document.createElement('button');
   modalButton.classList.add('btn', 'btn-primary', 'btn-sm');
   modalButton.dataset.id = id;
@@ -69,6 +70,10 @@ const renderModalButton = (t, id) => {
   modalButton.dataset.target = '#modal';
   modalButton.setAttribute('type', 'button');
   modalButton.textContent = t('buttons.postButton');
+  modalButton.addEventListener('click', (e) => {
+    state.readedPostsId = e.target.dataset.id;
+    state.processState = 'reading';
+  });
   return modalButton;
 };
 
@@ -89,7 +94,7 @@ const renderPosts = (t, posts, state) => {
     aEl.setAttribute('data-id', post.id);
     aEl.setAttribute('target', '_blank');
     aEl.setAttribute('rel', 'noopener noreferrer');
-    const buttonEl = renderModalButton(t, post.id);
+    const buttonEl = renderModalButton(t, post.id, state);
     liEl.append(aEl, buttonEl);
     ulElement.append(liEl);
   });

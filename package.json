@@ -22,7 +22,8 @@
   "homepage": "https://github.com/spolozova/frontend-project-lvl3#readme",
   "devDependencies": {
     "@babel/core": "7.13.14",
-    "@babel/preset-env": "7.13.12",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.13.12",
     "@webpack-cli/generators": "2.0.0",
     "babel-loader": "8.2.2",
     "css-loader": "5.2.0",
@@ -32,6 +33,7 @@
     "eslint-plugin-import": "2.22.1",
     "eslint-webpack-plugin": "2.5.3",
     "html-webpack-plugin": "5.3.1",
+    "mini-css-extract-plugin": "^1.5.1",
     "source-map-loader": "2.0.1",
     "style-loader": "2.0.0",
     "webpack": "5.30.0",
