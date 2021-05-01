@@ -74,7 +74,6 @@ export default () => {
 
   i18nextInstance.init({
     lng: 'ru',
-    debug: true,
     resources,
   })
     .then((t) => {
