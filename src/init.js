@@ -117,11 +117,6 @@ export default () => {
                 watchedState.processState = 'reading';
               });
             });
-            watchedState.form.feedback = 'success';
-            watchedState.form.state = 'succeeded';
-            watchedState.rssUrls.push(watchedState.form.value);
-          })
-          .then(() => {
             const aEl = document.querySelectorAll('a');
             aEl.forEach((el) => el.addEventListener('click', (ev) => {
               watchedState.readedPostsId.push(ev.target.dataset.id);
@@ -130,6 +125,9 @@ export default () => {
             modal.addEventListener('hide.bs.modal', () => {
               watchedState.processState = 'waiting';
             });
+            watchedState.form.feedback = 'success';
+            watchedState.form.state = 'succeeded';
+            watchedState.rssUrls.push(watchedState.form.value);
           })
           .then(() => {
             setTimeout(function run() {

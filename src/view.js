@@ -70,13 +70,6 @@ const renderModalButton = (t, id) => {
   modalButton.dataset.target = '#modal';
   modalButton.setAttribute('type', 'button');
   modalButton.textContent = t('buttons.postButton');
-  /* modalButton.addEventListener('click', (e) => {
-    console.log(state);
-    state.readedPostsId = e.target.dataset.id;
-    state.processState = 'reading';
-    console.log(state);
-  });
-  */
   return modalButton;
 };
 
@@ -109,7 +102,6 @@ const renderPosts = (t, posts, state) => {
 
 const modalComponentHandler = (state, value) => {
   const readButton = document.querySelector('.full-article');
-  console.log(state);
   if (value === 'reading') {
     const { length } = state.readedPostsId;
     const post = _.find(state.posts, { id: Number(state.readedPostsId[length - 1]) });
