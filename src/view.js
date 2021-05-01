@@ -74,6 +74,7 @@ const renderModalButton = (t, id, state) => {
     console.log(state);
     state.readedPostsId = e.target.dataset.id;
     state.processState = 'reading';
+    console.log(state);
   });
   return modalButton;
 };
