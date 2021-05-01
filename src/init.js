@@ -111,23 +111,21 @@ export default () => {
             watchedState.posts = [...postsList, ...watchedState.posts];
           })
           .then(() => {
-            watchedState.form.feedback = 'success';
-            watchedState.form.state = 'succeeded';
-            watchedState.rssUrls.push(watchedState.form.value);
-          })
-          .then(() => {
-            // const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-            const aEl = document.querySelectorAll('a');
-            aEl.forEach((el) => el.addEventListener('click', (ev) => {
-              watchedState.readedPostsId.push(ev.target.dataset.id);
-            }));
-            /* modalButtons.forEach((button) => {
+            document.querySelectorAll('[data-bs-toggle="modal"]').forEach((button) => {
               button.addEventListener('click', (event) => {
                 watchedState.readedPostsId.push(event.target.dataset.id);
                 watchedState.processState = 'reading';
               });
             });
-            */
+            watchedState.form.feedback = 'success';
+            watchedState.form.state = 'succeeded';
+            watchedState.rssUrls.push(watchedState.form.value);
+          })
+          .then(() => {
+            const aEl = document.querySelectorAll('a');
+            aEl.forEach((el) => el.addEventListener('click', (ev) => {
+              watchedState.readedPostsId.push(ev.target.dataset.id);
+            }));
             const modal = document.querySelector('.modal');
             modal.addEventListener('hide.bs.modal', () => {
               watchedState.processState = 'waiting';

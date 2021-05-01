@@ -60,7 +60,7 @@ const renderFeeds = (t, feeds) => {
   feedContainer.append(ulElement);
 };
 
-const renderModalButton = (t, id, state) => {
+const renderModalButton = (t, id) => {
   const modalButton = document.createElement('button');
   modalButton.classList.add('btn', 'btn-primary', 'btn-sm');
   modalButton.dataset.id = id;
@@ -70,12 +70,13 @@ const renderModalButton = (t, id, state) => {
   modalButton.dataset.target = '#modal';
   modalButton.setAttribute('type', 'button');
   modalButton.textContent = t('buttons.postButton');
-  modalButton.addEventListener('click', (e) => {
+  /* modalButton.addEventListener('click', (e) => {
     console.log(state);
     state.readedPostsId = e.target.dataset.id;
     state.processState = 'reading';
     console.log(state);
   });
+  */
   return modalButton;
 };
 
