@@ -73,7 +73,7 @@ export default () => {
   };
 
   i18nextInstance.init({
-    fallbackLng: 'ru',
+    lng: 'ru',
     debug: true,
     resources,
   })
