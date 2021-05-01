@@ -71,6 +71,7 @@ const renderModalButton = (t, id, state) => {
   modalButton.setAttribute('type', 'button');
   modalButton.textContent = t('buttons.postButton');
   modalButton.addEventListener('click', (e) => {
+    console.log(state);
     state.readedPostsId = e.target.dataset.id;
     state.processState = 'reading';
   });
