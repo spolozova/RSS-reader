@@ -108,6 +108,7 @@ const renderPosts = (t, posts, state) => {
 
 const modalComponentHandler = (state, value) => {
   const readButton = document.querySelector('.full-article');
+  console.log(state);
   if (value === 'reading') {
     const { length } = state.readedPostsId;
     const post = _.find(state.posts, { id: Number(state.readedPostsId[length - 1]) });
