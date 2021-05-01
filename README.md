@@ -1,5 +1,6 @@
 # RSS-reader
-#### This service provides the opportunity to read RSS feeds, updates them and adds new entries to the thread. It allows add an ulimited number of RSS feeds.
+#### This service provides the opportunity to read RSS feeds, updates them and adds new entries to the thread.
+#### It allows add an unlimited number of RSS feeds.
 ### [Start reading RSS](https://frontend-project-lvl3-eight-orcin.vercel.app/)
 ### Install 
 ```
