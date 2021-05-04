@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch",
     "start": "npx webpack serve",
-    "build": "NODE_ENV=production webpack --mode production"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -42,7 +42,8 @@
     "style-loader": "2.0.0",
     "webpack": "5.30.0",
     "webpack-cli": "4.6.0",
-    "webpack-dev-server": "3.11.2"
+    "webpack-dev-server": "3.11.2",
+    "node-sass": "^4.14.1"
   },
   "dependencies": {
     "@popperjs/core": "2.9.2",
@@ -52,6 +53,7 @@
     "jquery": "3.6.0",
     "lodash": "4.17.21",
     "on-change": "2.2.3",
-    "yup": "0.32.9"
+    "yup": "0.32.9",
+    "precss": "^4.0.0"
   }
 }
