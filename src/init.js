@@ -40,6 +40,26 @@ const validate = (state) => schema.validate(state.form.value)
     }
   });
 
+const dataForRendering = (state, data) => {
+  const { title, description, posts } = data;
+  state.feedsCounter += 1;
+  state.feeds = [{
+    id: state.feedsCounter,
+    title,
+    description,
+  },
+  ...state.feeds,
+  ];
+  const postsList = posts.map((post) => {
+    state.postsCounter += 1;
+    return {
+      id: state.postsCounter,
+      ...post,
+    };
+  });
+  state.posts = [...postsList, ...state.posts];
+};
+
 export default () => {
   const i18nextInstance = i18next.createInstance();
 
@@ -74,24 +94,7 @@ export default () => {
         validate(watchedState)
           .then(() => axios.get(getFullUrl(watchedState.form.value)))
           .then((response) => parseRss(response.data))
-          .then(({ title, description, posts }) => {
-            watchedState.feedsCounter += 1;
-            watchedState.feeds = [{
-              id: watchedState.feedsCounter,
-              title,
-              description,
-            },
-            ...watchedState.feeds,
-            ];
-            const postsList = posts.map((post) => {
-              watchedState.postsCounter += 1;
-              return {
-                id: watchedState.postsCounter,
-                ...post,
-              };
-            });
-            watchedState.posts = [...postsList, ...watchedState.posts];
-          })
+          .then((renderedData) => dataForRendering(watchedState, renderedData))
           .then(() => {
             document.querySelectorAll('[data-bs-toggle="modal"]').forEach((button) => {
               button.addEventListener('click', (event) => {
