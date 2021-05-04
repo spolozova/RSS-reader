@@ -12,20 +12,24 @@ const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disable
 const POSTS_REQUEST_TIMER = 5000;
 
 const updatePosts = (state) => {
-  const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url))
-    .then((response) => parseRss(response.data))
-    .then(({ posts }) => posts.forEach((post) => {
-      if (!_.find(state.posts, ['link', post.link])) {
-        state.postsCounter += 1;
-        state.posts = [{
-          id: state.postsCounter,
-          status: 'unreaded',
-          ...post,
-        },
-        ...state.posts];
-      }
-    })));
-  return Promise.all(requests);
+  console.log(new Date().getTime());
+  const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
+  Promise.all(requests)
+    .then((responses) => responses.map((response) => parseRss(response.data)))
+    .then((parsedData) => {
+      parsedData.forEach(({ posts }) => posts.forEach((post) => {
+        if (!_.find(state.posts, ['link', post.link])) {
+          state.postsCounter += 1;
+          state.posts = [{
+            id: state.postsCounter,
+            status: 'unreaded',
+            ...post,
+          },
+          ...state.posts];
+        }
+      }));
+    });
+  setTimeout(updatePosts, POSTS_REQUEST_TIMER, state);
 };
 
 const schema = yup.string().required('empty').url('invalidUrl');
@@ -127,10 +131,7 @@ export default () => {
             watchedState.rssUrls.push(watchedState.form.value);
           })
           .then(() => {
-            setTimeout(function run() {
-              updatePosts(watchedState);
-              setTimeout(run, POSTS_REQUEST_TIMER);
-            }, POSTS_REQUEST_TIMER);
+            setTimeout(updatePosts, POSTS_REQUEST_TIMER, watchedState);
           })
           .catch((err) => errorsHandler(err, watchedState));
       });
