@@ -12,22 +12,20 @@ const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disable
 const POSTS_REQUEST_TIMER = 5000;
 
 const updatePosts = (state) => {
-  const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
-  Promise.all(requests)
-    .then((responses) => responses.map((response) => parseRss(response.data)))
-    .then((parsedData) => {
-      parsedData.forEach(({ posts }) => posts.forEach((post) => {
-        if (!_.find(state.posts, ['link', post.link])) {
-          state.postsCounter += 1;
-          state.posts = [{
-            id: state.postsCounter,
-            status: 'unreaded',
-            ...post,
-          },
-          ...state.posts];
-        }
-      }));
-    });
+  const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url))
+    .then((response) => parseRss(response.data))
+    .then(({ posts }) => posts.forEach((post) => {
+      if (!_.find(state.posts, ['link', post.link])) {
+        state.postsCounter += 1;
+        state.posts = [{
+          id: state.postsCounter,
+          status: 'unreaded',
+          ...post,
+        },
+        ...state.posts];
+      }
+    })));
+  return Promise.all(requests);
 };
 
 const schema = yup.string().required('empty').url('invalidUrl');
@@ -100,6 +98,20 @@ export default () => {
     .then((t) => {
       const watchedState = initView(t, state);
       const form = document.querySelector('form');
+      const modal = document.querySelector('.modal');
+      const postsContainer = document.querySelector('.posts');
+      postsContainer.addEventListener('click', (event) => {
+        const { target } = event;
+        if (target.dataset.bsToggle === 'modal') {
+          watchedState.readedPostsId.push(event.target.dataset.id);
+          watchedState.processState = 'reading';
+        } else if (target.tagName === 'A') {
+          watchedState.readedPostsId.push(target.dataset.id);
+        }
+      });
+      modal.addEventListener('hide.bs.modal', () => {
+        watchedState.processState = 'waiting';
+      });
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         watchedState.form.state = 'validation';
@@ -110,20 +122,6 @@ export default () => {
           .then((response) => parseRss(response.data))
           .then((renderedData) => dataForRendering(watchedState, renderedData))
           .then(() => {
-            document.querySelectorAll('[data-bs-toggle="modal"]').forEach((button) => {
-              button.addEventListener('click', (event) => {
-                watchedState.readedPostsId.push(event.target.dataset.id);
-                watchedState.processState = 'reading';
-              });
-            });
-            const aEl = document.querySelectorAll('a');
-            aEl.forEach((el) => el.addEventListener('click', (ev) => {
-              watchedState.readedPostsId.push(ev.target.dataset.id);
-            }));
-            const modal = document.querySelector('.modal');
-            modal.addEventListener('hide.bs.modal', () => {
-              watchedState.processState = 'waiting';
-            });
             watchedState.form.feedback = 'success';
             watchedState.form.state = 'succeeded';
             watchedState.rssUrls.push(watchedState.form.value);
