@@ -60,6 +60,20 @@ const dataForRendering = (state, data) => {
   state.posts = [...postsList, ...state.posts];
 };
 
+const errorsHandler = (error, state) => {
+  if (error.message === 'invalidUrl' || error.message === 'repeatedUrl') {
+    state.form.valid = false;
+    state.form.feedback = error.message;
+  } else if (error.message === 'parserError') {
+    state.form.feedback = error.message;
+  } else if (error.message === 'empty') {
+    state.form.feedback = error.message;
+  } else {
+    state.form.feedback = 'networkError';
+  }
+  state.form.state = 'failed';
+};
+
 export default () => {
   const i18nextInstance = i18next.createInstance();
 
@@ -120,19 +134,7 @@ export default () => {
               setTimeout(run, POSTS_REQUEST_TIMER);
             }, POSTS_REQUEST_TIMER);
           })
-          .catch((err) => {
-            if (err.message === 'invalidUrl' || err.message === 'repeatedUrl') {
-              watchedState.form.valid = false;
-              watchedState.form.feedback = err.message;
-            } else if (err.message === 'parserError') {
-              watchedState.form.feedback = err.message;
-            } else if (err.message === 'empty') {
-              watchedState.form.feedback = err.message;
-            } else {
-              watchedState.form.feedback = 'networkError';
-            }
-            watchedState.form.state = 'failed';
-          });
+          .catch((err) => errorsHandler(err, watchedState));
       });
     });
 };
