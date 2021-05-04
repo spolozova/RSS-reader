@@ -32,15 +32,13 @@ const updatePosts = (state) => {
 
 const schema = yup.string().required('empty').url('invalidUrl');
 
-const validate = (state) => {
-  schema.validate(state.form.value)
-    .then(() => {
-      state.form.valid = true;
-      if (_.indexOf(state.rssUrls, state.form.value) !== -1) {
-        throw new Error('repeatedUrl');
-      }
-    });
-};
+const validate = (state) => schema.validate(state.form.value)
+  .then(() => {
+    state.form.valid = true;
+    if (_.indexOf(state.rssUrls, state.form.value) !== -1) {
+      throw new Error('repeatedUrl');
+    }
+  });
 
 export default () => {
   const i18nextInstance = i18next.createInstance();
