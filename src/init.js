@@ -5,31 +5,11 @@ import axios from 'axios';
 import 'bootstrap';
 
 import initView from './view.js';
-import resources from './locales';
+import resources from './locales.js';
+import parseRss from './parser.js';
 
 const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 const POSTS_REQUEST_TIMER = 5000;
-const parseRss = (data) => {
-  const parser = new DOMParser();
-  try {
-    const rssDom = parser.parseFromString(data.contents, 'text/xml');
-    const channel = rssDom.querySelector('channel');
-    const title = channel.querySelector('title').textContent;
-    const description = channel.querySelector('description').textContent;
-    const postsData = rssDom.querySelectorAll('item');
-    const posts = [];
-    postsData.forEach((post) => {
-      posts.push({
-        link: post.querySelector('link').textContent,
-        title: post.querySelector('title').textContent,
-        description: post.querySelector('description').textContent,
-      });
-    });
-    return { title, description, posts };
-  } catch (e) {
-    throw new Error('parserError');
-  }
-};
 
 const updatePosts = (state) => {
   const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
@@ -51,6 +31,16 @@ const updatePosts = (state) => {
 };
 
 const schema = yup.string().required('empty').url('invalidUrl');
+
+const validate = (state) => {
+  schema.validate(state.form.value)
+    .then(() => {
+      state.form.valid = true;
+      if (_.indexOf(state.rssUrls, state.form.value) !== -1) {
+        throw new Error('repeatedUrl');
+      }
+    });
+};
 
 export default () => {
   const i18nextInstance = i18next.createInstance();
@@ -83,13 +73,7 @@ export default () => {
         watchedState.form.state = 'validation';
         watchedState.form.feedback = '';
         watchedState.form.value = document.querySelector('input').value;
-        schema.validate(watchedState.form.value)
-          .then(() => {
-            watchedState.form.valid = true;
-            if (_.indexOf(watchedState.rssUrls, watchedState.form.value) !== -1) {
-              throw new Error('repeatedUrl');
-            }
-          })
+        validate(watchedState)
           .then(() => axios.get(getFullUrl(watchedState.form.value)))
           .then((response) => parseRss(response.data))
           .then(({ title, description, posts }) => {
