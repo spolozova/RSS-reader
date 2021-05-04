@@ -12,7 +12,6 @@ const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disable
 const POSTS_REQUEST_TIMER = 5000;
 
 const updatePosts = (state) => {
-  console.log(new Date().getTime());
   const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
   Promise.all(requests)
     .then((responses) => responses.map((response) => parseRss(response.data)))
