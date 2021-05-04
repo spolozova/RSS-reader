@@ -7,21 +7,22 @@
 #### This service provides the opportunity to read RSS feeds, updates them and adds new entries to the thread.
 #### It allows add an unlimited number of RSS feeds.
 ### [Live DEMO](https://frontend-project-lvl3-eight-orcin.vercel.app/)
-### Install  
+
+1. Install
 ```
 $ git clone git@github.com:spolozova/frontend-project-lvl3.git
 $ cd frontend-project-lvl3
 ```
-Setup dependences: 
+2. Setup dependences: 
 ```
 $ make install
 ```
-Build and deploiment
+3. Build and deploiment
 ```
 $ make build // for production
 $ make start // run local server
 ```
-Run linting
+4. Run linting
 ```
 $make lint // run linting
 ```
