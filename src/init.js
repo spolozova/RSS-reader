@@ -128,8 +128,6 @@ export default () => {
             watchedState.form.feedback = 'success';
             watchedState.form.state = 'succeeded';
             watchedState.rssUrls.push(watchedState.form.value);
-          })
-          .then(() => {
             setTimeout(updatePosts, POSTS_REQUEST_TIMER, watchedState);
           })
           .catch((err) => errorsHandler(err, watchedState));
