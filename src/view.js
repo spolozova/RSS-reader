@@ -1,45 +1,41 @@
-import _ from 'lodash';
-
 const onChange = require('on-change');
 
-const validationHandler = (t, state, value) => {
+const validationHandler = (value) => {
   const input = document.querySelector('input');
-  if (value === false) {
+  const feedback = document.querySelector('.feedback');
+  feedback.textContent = '';
+  if (value === 'invalid') {
     input.classList.add('is-invalid');
-  } else if (value === true) {
+  } else if (value === 'valid') {
     input.classList.remove('is-invalid');
   }
 };
 
-const processStateHandler = (t, state, value) => {
+const processStateHandler = (t, value) => {
   const submitButton = document.querySelector('[type="submit"]');
   submitButton.removeAttribute('disabled');
   const feedback = document.querySelector('.feedback');
   feedback.textContent = '';
   const input = document.querySelector('input');
-  if (value === 'validation') {
+  if (value === 'loading') {
     submitButton.setAttribute('disabled', '');
     input.setAttribute('readonly', '');
-  } else if (value === 'failed') {
-    feedback.classList.remove('text-success');
-    feedback.classList.add('text-danger');
-    input.removeAttribute('readonly', '');
-    feedback.textContent = t(state.form.feedback);
-  } else if (value === 'succeeded') {
+  } else if (value === 'processed') {
     feedback.classList.remove('text-danger');
     feedback.classList.add('text-success');
     input.removeAttribute('readonly', '');
     input.value = '';
-    feedback.textContent = t(state.form.feedback);
+    feedback.textContent = t('success');
+  } else {
+    input.removeAttribute('readonly', '');
   }
 };
 
-const readedPostsHandler = (values) => {
-  values.forEach((value) => {
-    const post = document.querySelector(`[data-id="${value}"]`);
-    post.classList.remove('fw-bold', 'font-weight-bold');
-    post.classList.add('fw-normal', 'font-weight-normal');
-  });
+const renderError = (t, value) => {
+  const feedback = document.querySelector('.feedback');
+  feedback.classList.remove('text-success');
+  feedback.classList.add('text-danger');
+  feedback.textContent = t(`errors.${value}`);
 };
 
 const renderFeeds = (t, feeds) => {
@@ -73,7 +69,7 @@ const renderModalButton = (t, id) => {
   return modalButton;
 };
 
-const renderPosts = (t, posts, state) => {
+const renderPosts = (t, posts) => {
   const postsContainer = document.querySelector('.posts');
   postsContainer.innerHTML = '';
   const hEl = document.createElement('h2');
@@ -86,50 +82,47 @@ const renderPosts = (t, posts, state) => {
     const aEl = document.createElement('a');
     aEl.href = post.link;
     aEl.textContent = post.title;
-    aEl.classList.add('fw-bold', 'text-decoration-none', 'font-weight-bold');
+    const fontWeight = post.readed ? ['fw-normal', 'font-weight-normal'] : ['fw-bold', 'font-weight-bold'];
+    aEl.classList.add('text-decoration-none', ...fontWeight);
     aEl.setAttribute('data-id', post.id);
     aEl.setAttribute('target', '_blank');
     aEl.setAttribute('rel', 'noopener noreferrer');
-    const buttonEl = renderModalButton(t, post.id, state);
+    const buttonEl = renderModalButton(t, post.id);
     liEl.append(aEl, buttonEl);
     ulElement.append(liEl);
   });
   postsContainer.append(hEl, ulElement);
-  if (state.readedPostsId.length !== 0) {
-    readedPostsHandler(state.readedPostsId);
-  }
 };
 
-const modalComponentHandler = (state, value) => {
+const modalDialogHandler = (post) => {
   const readButton = document.querySelector('.full-article');
-  if (value === 'reading') {
-    const { length } = state.readedPostsId;
-    const post = _.find(state.posts, { id: Number(state.readedPostsId[length - 1]) });
-    document.querySelector('.modal-title').textContent = post.title;
-    document.querySelector('.modal-body').textContent = post.description;
-    readButton.href = post.link;
-  }
+  document.querySelector('.modal-title').textContent = post.title;
+  document.querySelector('.modal-body').textContent = post.description;
+  readButton.href = post.link;
 };
 
 export default (t, state) => onChange(state, (path, value) => {
   switch (path) {
-    case 'form.state':
-      processStateHandler(t, state, value);
-      break;
-    case 'form.valid':
-      validationHandler(t, state, value);
+    case 'form.validationState':
+      validationHandler(value);
       break;
     case 'feeds':
       renderFeeds(t, value);
       break;
     case 'posts':
-      renderPosts(t, value, state);
-      break;
-    case 'readedPostsId':
-      readedPostsHandler(value);
+      renderPosts(t, value);
       break;
     case 'processState':
-      modalComponentHandler(state, value);
+      processStateHandler(t, value);
+      break;
+    case 'readedPost':
+      modalDialogHandler(value);
+      break;
+    case 'loadingError':
+      renderError(t, value);
+      break;
+    case 'form.validationError':
+      renderError(t, value);
       break;
     default:
       break;

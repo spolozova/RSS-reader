@@ -12,7 +12,8 @@ const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disable
 const POSTS_REQUEST_TIMER = 5000;
 
 const updatePosts = (state) => {
-  const requests = state.rssUrls.map((url) => axios.get(getFullUrl(url)));
+  const feedsUrls = state.feeds.map((feed) => feed.url);
+  const requests = feedsUrls.map((url) => axios.get(getFullUrl(url)));
   Promise.all(requests)
     .then((responses) => responses.map((response) => parseRss(response.data)))
     .then((parsedData) => {
@@ -27,27 +28,26 @@ const updatePosts = (state) => {
           ...state.posts];
         }
       }));
-    });
-  setTimeout(updatePosts, POSTS_REQUEST_TIMER, state);
+    })
+    .finally(() => setTimeout(updatePosts, POSTS_REQUEST_TIMER, state));
 };
 
-const schema = yup.string().required('empty').url('invalidUrl');
+const schema = yup.string().required().url();
 
-const validate = (state) => schema.validate(state.form.value)
-  .then(() => {
-    state.form.valid = true;
-    if (_.indexOf(state.rssUrls, state.form.value) !== -1) {
-      throw new Error('repeatedUrl');
-    }
-  });
+const validate = (state) => {
+  const feedsUrls = state.feeds.map((feed) => feed.url);
+  const urlValidationSchema = schema.notOneOf(feedsUrls);
+  return urlValidationSchema.validate(state.form.value);
+};
 
-const dataForRendering = (state, data) => {
+const getDataForRendering = (state, data) => {
   const { title, description, posts } = data;
   state.feedsCounter += 1;
   state.feeds = [{
     id: state.feedsCounter,
     title,
     description,
+    url: state.form.value,
   },
   ...state.feeds,
   ];
@@ -62,17 +62,17 @@ const dataForRendering = (state, data) => {
 };
 
 const errorsHandler = (error, state) => {
-  if (error.message === 'invalidUrl' || error.message === 'repeatedUrl') {
-    state.form.valid = false;
-    state.form.feedback = error.message;
+  console.log(error.type);
+  if (error.name === 'ValidationError') {
+    state.form.validationState = 'invalid';
+    state.form.validationError = error.type;
   } else if (error.message === 'parserError') {
-    state.form.feedback = error.message;
-  } else if (error.message === 'empty') {
-    state.form.feedback = error.message;
+    state.loadingError = error.message;
+  } else if (axios.isAxiosError(error)) {
+    state.loadingError = 'networkError';
   } else {
-    state.form.feedback = 'networkError';
+    state.loadingError = 'unexpectedError';
   }
-  state.form.state = 'failed';
 };
 
 export default () => {
@@ -81,12 +81,11 @@ export default () => {
   const state = {
     form: {
       value: '',
-      state: 'filling',
-      valid: true,
-      feedback: '',
+      validationState: 'waiting',
+      validationError: '',
     },
     processState: 'waiting',
-    rssUrls: [],
+    loadingError: '',
     feeds: [],
     posts: [],
     feedsCounter: 0,
@@ -100,37 +99,41 @@ export default () => {
   })
     .then((t) => {
       const watchedState = initView(t, state);
+      setTimeout(updatePosts, POSTS_REQUEST_TIMER, watchedState);
       const form = document.querySelector('form');
-      const modal = document.querySelector('.modal');
       const postsContainer = document.querySelector('.posts');
       postsContainer.addEventListener('click', (event) => {
-        const { target } = event;
-        if (target.dataset.bsToggle === 'modal') {
-          watchedState.readedPostsId.push(event.target.dataset.id);
-          watchedState.processState = 'reading';
-        } else if (target.tagName === 'A') {
-          watchedState.readedPostsId.push(target.dataset.id);
+        const { id, bsToggle } = event.target.dataset;
+        watchedState.posts.forEach((post) => {
+          if (`${post.id}` === id) {
+            post.readed = true;
+          }
+        });
+        if (bsToggle === 'modal') {
+          watchedState.readedPost = watchedState.posts.find((post) => `${post.id}` === id);
         }
-      });
-      modal.addEventListener('hide.bs.modal', () => {
-        watchedState.processState = 'waiting';
       });
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        watchedState.form.state = 'validation';
-        watchedState.form.feedback = '';
+        watchedState.form.validationState = 'processing';
+        watchedState.form.validationError = '';
+        watchedState.loadingError = '';
         watchedState.form.value = document.querySelector('input').value;
         validate(watchedState)
-          .then(() => axios.get(getFullUrl(watchedState.form.value)))
-          .then((response) => parseRss(response.data))
-          .then((renderedData) => dataForRendering(watchedState, renderedData))
           .then(() => {
-            watchedState.form.feedback = 'success';
-            watchedState.form.state = 'succeeded';
-            watchedState.rssUrls.push(watchedState.form.value);
-            setTimeout(updatePosts, POSTS_REQUEST_TIMER, watchedState);
+            watchedState.form.validationState = 'valid';
+            watchedState.processState = 'loading';
+            return axios.get(getFullUrl(watchedState.form.value));
           })
-          .catch((err) => errorsHandler(err, watchedState));
+          .then((response) => parseRss(response.data))
+          .then((renderedData) => getDataForRendering(watchedState, renderedData))
+          .then(() => {
+            watchedState.processState = 'processed';
+          })
+          .catch((err) => {
+            watchedState.processState = 'waiting';
+            errorsHandler(err, watchedState);
+          });
       });
     });
 };
