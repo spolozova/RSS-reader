@@ -62,7 +62,6 @@ const getDataForRendering = (state, data) => {
 };
 
 const errorsHandler = (error, state) => {
-  console.log(error.type);
   if (error.name === 'ValidationError') {
     state.form.validationState = 'invalid';
     state.form.validationError = error.type;
