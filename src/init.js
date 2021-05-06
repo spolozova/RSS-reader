@@ -83,7 +83,7 @@ export default () => {
       validationState: 'waiting',
       validationError: '',
     },
-    processState: 'waiting',
+    loadingProcessState: 'waiting',
     loadingError: '',
     feeds: [],
     posts: [],
@@ -121,16 +121,16 @@ export default () => {
         validate(watchedState)
           .then(() => {
             watchedState.form.validationState = 'valid';
-            watchedState.processState = 'loading';
+            watchedState.loadingProcessState = 'loading';
             return axios.get(getFullUrl(watchedState.form.value));
           })
           .then((response) => parseRss(response.data))
           .then((renderedData) => getDataForRendering(watchedState, renderedData))
           .then(() => {
-            watchedState.processState = 'processed';
+            watchedState.loadingProcessState = 'processed';
           })
           .catch((err) => {
-            watchedState.processState = 'waiting';
+            watchedState.loadingProcessState = 'waiting';
             errorsHandler(err, watchedState);
           });
       });

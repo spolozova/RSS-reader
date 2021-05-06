@@ -112,7 +112,7 @@ export default (t, state) => onChange(state, (path, value) => {
     case 'posts':
       renderPosts(t, value);
       break;
-    case 'processState':
+    case 'loadingProcessState':
       processStateHandler(t, value);
       break;
     case 'readedPost':
