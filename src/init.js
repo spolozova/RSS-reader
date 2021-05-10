@@ -61,17 +61,20 @@ const getDataForRendering = (state, data) => {
   state.posts = [...postsList, ...state.posts];
 };
 
-const errorsHandler = (error, state) => {
-  if (error.name === 'ValidationError') {
-    state.form.validationState = 'invalid';
-    state.form.validationError = error.type;
-  } else if (error.message === 'parserError') {
+const loadingErrorsHandler = (error, state) => {
+  state.loadingProcessState = 'failed';
+  if (error.message === 'parserError') {
     state.loadingError = error.message;
-  } else if (axios.isAxiosError(error)) {
+  } else if (error.isAxiosError) {
     state.loadingError = 'networkError';
   } else {
     state.loadingError = 'unexpectedError';
   }
+};
+
+const validationErrorsHandler = (error, state) => {
+  state.form.validationState = 'invalid';
+  state.form.validationError = error.type;
 };
 
 export default () => {
@@ -130,8 +133,11 @@ export default () => {
             watchedState.loadingProcessState = 'processed';
           })
           .catch((err) => {
-            watchedState.loadingProcessState = 'waiting';
-            errorsHandler(err, watchedState);
+            if (err.name === 'ValidationError') {
+              validationErrorsHandler(err, watchedState);
+            } else {
+              loadingErrorsHandler(err, watchedState);
+            }
           });
       });
     });
