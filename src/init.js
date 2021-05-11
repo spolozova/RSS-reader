@@ -8,8 +8,53 @@ import initView from './view.js';
 import resources from './locales.js';
 import parseRss from './parser.js';
 
-const getFullUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 const POSTS_REQUEST_TIMER = 5000;
+const PROXY_URL = 'https://hexlet-allorigins.herokuapp.com';
+
+const getFullUrl = (url) => {
+  const fullUrl = new URL('/get', PROXY_URL);
+  fullUrl.searchParams.set('disableCache', 'true');
+  fullUrl.searchParams.set('url', url);
+  return fullUrl.toString();
+};
+
+const updateFeedsData = (state, data, url) => {
+  const { title, description, posts } = data;
+  state.feeds = [{
+    id: _.uniqueId(),
+    title,
+    description,
+    url,
+  },
+  ...state.feeds,
+  ];
+  const postsList = posts.map((post) => {
+    const updatedPost = {
+      id: _.uniqueId(),
+      ...post,
+    };
+    return updatedPost;
+  });
+  state.posts = [...postsList, ...state.posts];
+};
+
+const loadRss = (url, state) => {
+  state.loadingProcessState = 'loading';
+  const fullUrl = getFullUrl(url);
+  return axios.get(fullUrl)
+    .then((response) => parseRss(response.data))
+    .then((parsedData) => updateFeedsData(state, parsedData, url))
+    .then(() => {
+      state.loadingProcessState = 'processed';
+    })
+    .catch((error) => {
+      state.loadingProcessState = 'failed';
+      if (error.isAxiosError) {
+        error.code = 'networkError';
+      }
+      state.loadingError = error.code;
+    });
+};
 
 const updatePosts = (state) => {
   const feedsUrls = state.feeds.map((feed) => feed.url);
@@ -17,64 +62,32 @@ const updatePosts = (state) => {
   Promise.all(requests)
     .then((responses) => responses.map((response) => parseRss(response.data)))
     .then((parsedData) => {
-      parsedData.forEach(({ posts }) => posts.forEach((post) => {
-        if (!_.find(state.posts, ['link', post.link])) {
-          state.postsCounter += 1;
-          state.posts = [{
-            id: state.postsCounter,
-            status: 'unreaded',
-            ...post,
-          },
-          ...state.posts];
-        }
-      }));
+      const newPosts = parsedData.flatMap(({ posts }) => _.differenceBy(posts, state.posts, 'guid'));
+      newPosts.forEach((post) => {
+        state.posts = [{
+          id: _.uniqueId(),
+          status: 'unreaded',
+          ...post,
+        },
+        ...state.posts];
+      });
     })
     .finally(() => setTimeout(updatePosts, POSTS_REQUEST_TIMER, state));
 };
 
 const schema = yup.string().required().url();
 
-const validate = (state) => {
+const validate = (url, state) => {
   const feedsUrls = state.feeds.map((feed) => feed.url);
   const urlValidationSchema = schema.notOneOf(feedsUrls);
-  return urlValidationSchema.validate(state.form.value);
-};
-
-const getDataForRendering = (state, data) => {
-  const { title, description, posts } = data;
-  state.feedsCounter += 1;
-  state.feeds = [{
-    id: state.feedsCounter,
-    title,
-    description,
-    url: state.form.value,
-  },
-  ...state.feeds,
-  ];
-  const postsList = posts.map((post) => {
-    state.postsCounter += 1;
-    return {
-      id: state.postsCounter,
-      ...post,
-    };
-  });
-  state.posts = [...postsList, ...state.posts];
-};
-
-const loadingErrorsHandler = (error, state) => {
-  state.loadingProcessState = 'failed';
-  if (error.message === 'parserError') {
-    state.loadingError = error.message;
-  } else if (error.isAxiosError) {
-    state.loadingError = 'networkError';
-  } else {
-    state.loadingError = 'unexpectedError';
-  }
-};
-
-const validationErrorsHandler = (error, state) => {
-  state.form.validationState = 'invalid';
-  state.form.validationError = error.type;
+  return urlValidationSchema.validate(url)
+    .then(() => {
+      state.form.validationState = 'valid';
+    })
+    .catch((e) => {
+      e.code = e.type;
+      throw e;
+    });
 };
 
 export default () => {
@@ -82,16 +95,14 @@ export default () => {
 
   const state = {
     form: {
-      value: '',
+      value: null,
       validationState: 'waiting',
-      validationError: '',
+      validationError: null,
     },
     loadingProcessState: 'waiting',
-    loadingError: '',
+    loadingError: null,
     feeds: [],
     posts: [],
-    feedsCounter: 0,
-    postsCounter: 0,
     readedPostsId: [],
   };
 
@@ -118,26 +129,16 @@ export default () => {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         watchedState.form.validationState = 'processing';
-        watchedState.form.validationError = '';
-        watchedState.loadingError = '';
-        watchedState.form.value = document.querySelector('input').value;
-        validate(watchedState)
+        watchedState.form.validationError = null;
+        watchedState.loadingError = null;
+        const url = document.querySelector('input').value;
+        validate(url, watchedState)
           .then(() => {
-            watchedState.form.validationState = 'valid';
-            watchedState.loadingProcessState = 'loading';
-            return axios.get(getFullUrl(watchedState.form.value));
-          })
-          .then((response) => parseRss(response.data))
-          .then((renderedData) => getDataForRendering(watchedState, renderedData))
-          .then(() => {
-            watchedState.loadingProcessState = 'processed';
+            loadRss(url, watchedState);
           })
           .catch((err) => {
-            if (err.name === 'ValidationError') {
-              validationErrorsHandler(err, watchedState);
-            } else {
-              loadingErrorsHandler(err, watchedState);
-            }
+            watchedState.form.validationState = 'invalid';
+            watchedState.form.validationError = err.code;
           });
       });
     });

@@ -3,11 +3,16 @@ const onChange = require('on-change');
 const validationHandler = (value) => {
   const input = document.querySelector('input');
   const feedback = document.querySelector('.feedback');
-  feedback.textContent = '';
-  if (value === 'invalid') {
-    input.classList.add('is-invalid');
-  } else if (value === 'valid') {
-    input.classList.remove('is-invalid');
+  switch (value) {
+    case 'invalid':
+      input.classList.add('is-invalid');
+      break;
+    case 'valid':
+      input.classList.remove('is-invalid');
+      break;
+    default:
+      feedback.textContent = '';
+      break;
   }
 };
 
@@ -17,25 +22,31 @@ const processStateHandler = (t, value) => {
   const feedback = document.querySelector('.feedback');
   feedback.textContent = '';
   const input = document.querySelector('input');
-  if (value === 'loading') {
-    submitButton.setAttribute('disabled', '');
-    input.setAttribute('readonly', '');
-  } else if (value === 'processed') {
-    feedback.classList.remove('text-danger');
-    feedback.classList.add('text-success');
-    input.removeAttribute('readonly', '');
-    input.value = '';
-    feedback.textContent = t('success');
-  } else {
-    input.removeAttribute('readonly', '');
+  switch (value) {
+    case 'loading':
+      submitButton.setAttribute('disabled', '');
+      input.setAttribute('readonly', '');
+      break;
+    case 'processed':
+      feedback.classList.remove('text-danger');
+      feedback.classList.add('text-success');
+      input.removeAttribute('readonly', '');
+      input.value = '';
+      feedback.textContent = t('success');
+      break;
+    default:
+      input.removeAttribute('readonly', '');
+      break;
   }
 };
 
 const renderError = (t, value) => {
-  const feedback = document.querySelector('.feedback');
-  feedback.classList.remove('text-success');
-  feedback.classList.add('text-danger');
-  feedback.textContent = t(`errors.${value}`);
+  if (value) {
+    const feedback = document.querySelector('.feedback');
+    feedback.classList.remove('text-success');
+    feedback.classList.add('text-danger');
+    feedback.textContent = t(`errors.${value}`);
+  }
 };
 
 const renderFeeds = (t, feeds) => {

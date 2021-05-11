@@ -1,21 +1,34 @@
 export default (data) => {
   const parser = new DOMParser();
-  try {
-    const rssDom = parser.parseFromString(data.contents, 'text/xml');
+  const rssDom = parser.parseFromString(data.contents, 'text/xml');
+  if (rssDom.querySelector('parsererror')) {
+    const error = new Error();
+    error.code = 'parserError';
+    throw error;
+  } else {
     const channel = rssDom.querySelector('channel');
-    const title = channel.querySelector('title').textContent;
-    const description = channel.querySelector('description').textContent;
+    const titleElement = channel.querySelector('title');
+    const descriptionElemrnt = channel.querySelector('description');
+    const feedTitle = titleElement.textContent;
+    const feedDescription = descriptionElemrnt.textContent;
     const postsData = rssDom.querySelectorAll('item');
     const posts = [];
     postsData.forEach((post) => {
+      const postLink = post.querySelector('link');
+      const postTitle = post.querySelector('title');
+      const postDescription = post.querySelector('description');
+      const postGuid = post.querySelector('guid');
       posts.push({
-        link: post.querySelector('link').textContent,
-        title: post.querySelector('title').textContent,
-        description: post.querySelector('description').textContent,
+        link: postLink.textContent,
+        title: postTitle.textContent,
+        description: postDescription.textContent,
+        guid: postGuid.textContent,
       });
     });
-    return { title, description, posts };
-  } catch (e) {
-    throw new Error('parserError');
+    return {
+      title: feedTitle,
+      description: feedDescription,
+      posts,
+    };
   }
 };
