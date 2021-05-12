@@ -51,6 +51,12 @@ const loadRss = (url, state) => {
       state.loadingError = error.code;
     });
 };
+const isDifference = (object1, object2) => {
+  if (object1.guid) {
+    return object1.guid === object2.guid;
+  }
+  return object1.link === object2.link && object1.title === object2.title;
+};
 
 const updatePosts = (state) => {
   const feedsUrls = state.feeds.map((feed) => feed.url);
@@ -58,7 +64,8 @@ const updatePosts = (state) => {
   Promise.all(requests)
     .then((responses) => responses.map((response) => parseRss(response.data)))
     .then((parsedData) => {
-      const newPosts = parsedData.flatMap(({ posts }) => _.differenceBy(posts, state.posts, 'guid'));
+      const newPosts = parsedData
+        .flatMap(({ posts }) => _.differenceWith(posts, state.posts, isDifference));
       newPosts.forEach((post) => {
         state.posts = [{
           id: _.uniqueId(),
