@@ -106,7 +106,7 @@ export default () => {
     readedPostsId: [],
   };
 
-  i18nextInstance.init({
+  return i18nextInstance.init({
     lng: 'ru',
     resources,
   })
