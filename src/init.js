@@ -28,13 +28,7 @@ const updateFeedsData = (state, data, url) => {
   },
   ...state.feeds,
   ];
-  const postsList = posts.map((post) => {
-    const updatedPost = {
-      id: _.uniqueId(),
-      ...post,
-    };
-    return updatedPost;
-  });
+  const postsList = posts.map((post) => ({ id: _.uniqueId(), ...post }));
   state.posts = [...postsList, ...state.posts];
 };
 
@@ -51,6 +45,8 @@ const loadRss = (url, state) => {
       state.loadingProcessState = 'failed';
       if (error.isAxiosError) {
         error.code = 'networkError';
+      } else if (!error.isAxiosError && !error.code) {
+        error.code = 'unexpectedError';
       }
       state.loadingError = error.code;
     });
@@ -95,7 +91,6 @@ export default () => {
 
   const state = {
     form: {
-      value: null,
       validationState: 'waiting',
       validationError: null,
     },
