@@ -3,7 +3,7 @@ export default (data) => {
   const rssDom = parser.parseFromString(data.contents, 'text/xml');
   const parserError = rssDom.querySelector('parsererror');
   if (parserError) {
-    const error = new Error(parserError.innerText);
+    const error = new Error(parserError.textContent);
     error.code = 'parserError';
     throw error;
   }
