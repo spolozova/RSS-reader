@@ -105,7 +105,7 @@ export default () => {
     loadingError: null,
     feeds: [],
     posts: [],
-    readedPostsId: [],
+    readedPost: null,
   };
 
   return i18nextInstance.init({

@@ -23,7 +23,7 @@ export default (data) => {
       link: postLink.textContent,
       title: postTitle.textContent,
       description: postDescription.textContent,
-      guid: postGuid.textContent,
+      guid: postGuid?.textContent,
     });
   });
   return {
