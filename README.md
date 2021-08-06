@@ -11,8 +11,8 @@
 ### Usage
 1. Install
 ```
-$ git clone git@github.com:spolozova/frontend-project-lvl3.git
-$ cd frontend-project-lvl3
+$ git clone git@github.com:spolozova/RSS-reader.git
+$ cd RSS-reader
 ```
 2. Setup dependences: 
 ```
