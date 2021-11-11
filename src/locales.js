@@ -16,7 +16,7 @@ export default {
       },
       success: 'RSS успешно загружен',
       feeds: 'Фиды',
-      posts: 'Посты',
+      posts: 'Посты ',
     },
   },
 };
